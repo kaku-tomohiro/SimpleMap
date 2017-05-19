@@ -25,8 +25,11 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
+import android.widget.Button;
+import android.view.View;
+
 public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, View.OnClickListener {
     private final static String TAG = "MainActivity";
 
     private GoogleMap googleMap;
@@ -43,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements
             Manifest.permission.ACCESS_FINE_LOCATION
     };
     private final static int REQCODE_PERMISSIONS = 1111;
+
+    private Button locationChangeBtn;
+    private Location now;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+        locationChangeBtn = (Button)findViewById(R.id.locationChangeBtn);
+        locationChangeBtn.setOnClickListener(this);
     }
 
     @Override
@@ -121,8 +131,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged: " + location);
-        googleMap.animateCamera(CameraUpdateFactory
-                .newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+        //googleMap.animateCamera(CameraUpdateFactory
+          //      .newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+        this.now = location;
     }
 
     @Override
@@ -133,6 +144,16 @@ public class MainActivity extends AppCompatActivity implements
         case REQCODE_PERMISSIONS:
             startLocationUpdate(false);
             break;
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.locationChangeBtn:
+                googleMap.animateCamera(CameraUpdateFactory
+                        .newLatLng(new LatLng(now.getLatitude(), now.getLongitude())));
+                break;
         }
     }
 
